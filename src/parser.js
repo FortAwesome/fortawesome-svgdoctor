@@ -15,12 +15,12 @@ function optimize(svgData) {
   });
 }
 
-function inspect(parsedSvg) {
+function inspect(rawSvg, parsedSvg) {
   return new Promise((resolve) => {
     const determinations = {};
 
     for (const key of Object.keys(inspectors)) {
-      determinations[key] = inspectors[key](parsedSvg);
+      determinations[key] = inspectors[key](rawSvg, parsedSvg);
     }
 
     resolve(determinations);
@@ -62,7 +62,7 @@ function generateMessages(determinations) {
   });
 }
 
-export default function (svgData) {
+export default function (svgDataBuffer) {
   const output = {
     stoplight: null,
     messages: {
@@ -73,7 +73,7 @@ export default function (svgData) {
   };
 
   return new Promise((resolve) => {
-    svg2js(svgData, (parsedSvg) => {
+    svg2js(svgDataBuffer, (parsedSvg) => {
       const { error } = parsedSvg;
 
       if (error) {
@@ -81,11 +81,13 @@ export default function (svgData) {
         output.stoplight = STOPLIGHT_RED;
       }
 
-      optimize(svgData)
+      const svgData = svgDataBuffer.toString();
+
+      optimize(svgDataBuffer)
         .then((optimizedData) => {
           output.optimized = optimizedData.data;
 
-          return inspect(parsedSvg);
+          return inspect(svgData, (error) ? null : parsedSvg);
         })
         .then(determinations => generateMessages(determinations))
         .then((generated) => {

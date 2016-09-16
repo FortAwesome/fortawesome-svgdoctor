@@ -49,9 +49,6 @@ describe('Parser', function () {
       });
   });
 
-  xit('will detect a Sketch formatted file', function (done) {
-  });
-
   it('will detect overlapping points (example 1)', function (done) {
     parser(fixture('tons-of-overlapping-points-1.svg'))
       .then((output) => {
@@ -68,5 +65,26 @@ describe('Parser', function () {
         expect(output).to.warn('OVERLAPPING_POINTS');
         done();
       });
+  });
+
+  it('will detect a Sketch formatted file', function (done) {
+    parser(fixture('sketch-formatted.svg'))
+      .then((output) => {
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('SKETCH_FORMAT');
+        done();
+      });
+  });
+
+  it('will detect a small viewbox with low precision', function (done) {
+    parser(fixture('small-and-low-precision.svg'))
+      .then((output) => {
+        expect(output).to.be.yellowStoplight();
+        expect(output).to.warn('LOW_PRECISION');
+        done();
+      });
+  });
+
+  xit('will detect a path that has no fill', function (done) {
   });
 });
