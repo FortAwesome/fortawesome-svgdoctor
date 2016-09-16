@@ -23,6 +23,11 @@
     "babel-preset-es2015-node4": "*",
     "chai": "*",
     "coveralls": "*",
+    "eslint": "^3.5.0",
+    "eslint-config-airbnb": "^11.1.0",
+    "eslint-plugin-import": "^1.15.0",
+    "eslint-plugin-jsx-a11y": "^2.2.2",
+    "eslint-plugin-react": "^6.2.2",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "isparta": "*",
@@ -31,6 +36,9 @@
   },
   "dependencies": {
     "cli": "^1.0.0",
+    "eslint": "^3.5.0",
+    "eslint-config-airbnb": "^11.1.0",
+    "lodash-node": "^3.10.2",
     "svg-path-parser": "^1.0.1",
     "svgo": "^0.7.0"
   }

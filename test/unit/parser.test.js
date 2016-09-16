@@ -12,20 +12,28 @@ describe('Parser', function () {
     parser(fixture('bad-file-type.jpg'))
       .then((output) => {
         expect(output.messages.errors.length).to.equal(1);
-        expect(output.stoplight).to.equal("red");
+        expect(output.stoplight).to.equal('red');
 
         done();
-      })
+      });
   });
 
   it('will optimize the file', function (done) {
     parser(fixture('valid.svg'))
       .then((output) => {
         expect(output.messages.errors.length).to.equal(0);
-        expect(output.stoplight).to.equal("green");
+        expect(output.stoplight).to.equal('green');
         expect(output.optimized.length).to.be.above(0);
 
         done();
-      })
+      });
+  });
+
+  it('will prevent an SVG that crashes FontForge', function (done) {
+    parser(fixture('dropforge-killer.svg'))
+      .then((output) => {
+        expect(output.messages.errors[0].code).to.equal('PATH_STROKES');
+        done();
+      });
   });
 });
