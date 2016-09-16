@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 import fs from 'fs';
 
+import '../helpers/matchers';
+
 import parser from '../../src/parser';
 
 describe('Parser', function () {
@@ -21,8 +23,8 @@ describe('Parser', function () {
   it('will optimize the file', function (done) {
     parser(fixture('valid.svg'))
       .then((output) => {
-        expect(output.messages.errors.length).to.equal(0);
         expect(output.stoplight).to.equal('green');
+        expect(output.messages.errors.length).to.equal(0);
         expect(output.optimized.length).to.be.above(0);
 
         done();
@@ -32,7 +34,38 @@ describe('Parser', function () {
   it('will prevent an SVG that crashes FontForge', function (done) {
     parser(fixture('dropforge-killer.svg'))
       .then((output) => {
-        expect(output.messages.errors[0].code).to.equal('PATH_STROKES');
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('PATH_STROKES');
+        done();
+      });
+  });
+
+  it('will detect a lot of points', function (done) {
+    parser(fixture('lots-of-points.svg'))
+      .then((output) => {
+        expect(output).to.be.yellowStoplight();
+        expect(output).to.warn('LOTS_OF_POINTS');
+        done();
+      });
+  });
+
+  xit('will detect a Sketch formatted file', function (done) {
+  });
+
+  it('will detect overlapping points (example 1)', function (done) {
+    parser(fixture('tons-of-overlapping-points-1.svg'))
+      .then((output) => {
+        expect(output).to.be.yellowStoplight();
+        expect(output).to.warn('OVERLAPPING_POINTS');
+        done();
+      });
+  });
+
+  it('will detect overlapping points (example 2)', function (done) {
+    parser(fixture('tons-of-overlapping-points-2.svg'))
+      .then((output) => {
+        expect(output).to.be.yellowStoplight();
+        expect(output).to.warn('OVERLAPPING_POINTS');
         done();
       });
   });
