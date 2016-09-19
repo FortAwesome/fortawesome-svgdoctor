@@ -94,7 +94,16 @@ describe('Parser', function () {
       });
   });
 
-  xit('will detect image or CDATA elements', function (done) {
+  it.only('will detect if the entire SVG is set to display: none', function (done) {
+    parser(fixture('svg-display-none.svg'))
+      .then((output) => {
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('EVERYTHING_HIDDEN');
+        done();
+      });
+  });
+
+  it('will detect image or CDATA elements', function (done) {
   });
 
   xit('will require a viewbox or an x and y', function (done) {

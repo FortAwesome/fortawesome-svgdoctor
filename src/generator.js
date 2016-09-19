@@ -68,7 +68,18 @@ const MESSAGES = [
       yield {
         warning: {
           code: 'INVISIBLE_OBJECTS',
-          desc: 'There are objects that have a fill of "none". These will become visible objects once converted.'
+          desc: 'There are objects that have a fill of "none". These will become visible objects once converted.',
+        },
+      };
+    }
+  },
+
+  function* everythingIsHidden(d) {
+    if (d.everythingIsHidden) {
+      yield {
+        error: {
+          code: 'EVERYTHING_HIDDEN',
+          decs: 'The <svg> element is set to "display: none" which will result in everything being hidden.',
         },
       };
     }

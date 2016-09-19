@@ -138,4 +138,18 @@ export default {
 
     return filter(uniq(value));
   },
+
+  everythingIsHidden(_raw, svg) {
+    let value = false;
+
+    if (svg) {
+      mapElements(svg, { type: 'svg' }, (elem) => {
+        if (elem.attrs && elem.attrs.display && elem.attrs.display.value === 'none') {
+          value = true;
+        }
+      });
+    }
+
+    return value;
+  },
 };
