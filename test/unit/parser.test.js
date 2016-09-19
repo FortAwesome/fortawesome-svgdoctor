@@ -85,6 +85,21 @@ describe('Parser', function () {
       });
   });
 
-  xit('will detect a path that has no fill', function (done) {
+  it('will detect a path that has no fill', function (done) {
+    parser(fixture('paths-with-no-fill.svg'))
+      .then((output) => {
+        expect(output).to.be.yellowStoplight();
+        expect(output).to.warn('INVISIBLE_OBJECTS');
+        done();
+      });
+  });
+
+  xit('will detect image or CDATA elements', function (done) {
+  });
+
+  xit('will require a viewbox or an x and y', function (done) {
+  });
+
+  xit('will detect references to fonts', function (done) {
   });
 });

@@ -1,6 +1,9 @@
 import some from 'lodash-node/modern/collection/some';
 import sum from 'lodash-node/modern/math/sum';
 import flatten from 'lodash-node/modern/array/flatten';
+import uniq from 'lodash-node/modern/array/uniq';
+import filter from 'lodash-node/modern/collection/filter';
+import css from 'css';
 import svgPathParser from 'svg-path-parser';
 import { mapElements } from './utils';
 
@@ -108,5 +111,31 @@ export default {
     }
 
     return value;
+  },
+
+  fillsUsed(_raw, svg) {
+    const declaredFills = {};
+    let value = [];
+
+    if (svg) {
+      mapElements(svg, { type: 'style' }, (elem) => {
+        const { stylesheet } = css.parse(elem.content[0].text);
+        for (const rule of stylesheet.rules) {
+          for (const declaration of rule.declarations) {
+            if (declaration.property === 'fill') {
+              declaredFills[rule.selectors[0]] = declaration.value;
+            }
+          }
+        }
+      });
+
+      value = mapElements(svg, {}, (elem) => {
+        const cssClass = (elem.attrs && elem.attrs.class) ? elem.attrs.class.value : '';
+
+        return declaredFills[`.${cssClass}`];
+      });
+    }
+
+    return filter(uniq(value));
   },
 };

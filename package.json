@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "cli": "^1.0.0",
+    "css": "^2.2.1",
     "eslint": "^3.5.0",
     "eslint-config-airbnb": "^11.1.0",
     "lodash-node": "^3.10.2",

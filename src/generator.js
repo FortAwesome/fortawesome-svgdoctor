@@ -62,5 +62,16 @@ const MESSAGES = [
       };
     }
   },
+
+  function* invisibleObjects(d) {
+    if (~d.fillsUsed.indexOf('none')) {
+      yield {
+        warning: {
+          code: 'INVISIBLE_OBJECTS',
+          desc: 'There are objects that have a fill of "none". These will become visible objects once converted.'
+        },
+      };
+    }
+  },
 ];
 
