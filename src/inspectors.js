@@ -1,3 +1,4 @@
+import get from 'lodash-node/modern/object/get';
 import some from 'lodash-node/modern/collection/some';
 import sum from 'lodash-node/modern/math/sum';
 import flatten from 'lodash-node/modern/array/flatten';
@@ -5,7 +6,7 @@ import uniq from 'lodash-node/modern/array/uniq';
 import filter from 'lodash-node/modern/collection/filter';
 import css from 'css';
 import svgPathParser from 'svg-path-parser';
-import { mapElements } from './utils';
+import { mapElements, hasElementType } from './utils';
 
 export default {
   strokedPaths(_raw, svg) {
@@ -67,6 +68,10 @@ export default {
     return raw.includes('sketch:type');
   },
 
+  inkscapeFormat(raw) {
+    return raw.includes('inkscape:');
+  },
+
   decimalPrecision(_raw, svg) {
     let value = 0;
 
@@ -103,7 +108,8 @@ export default {
 
     if (svg) {
       const viewboxes = mapElements(svg, { type: 'svg' }, (elem) => {
-        const corners = elem.attrs.viewBox.value.split(' ').map(i => parseInt(i, 10));
+        const rawViewbox = get(elem, 'attrs.viewBox.value', null);
+        const corners = (rawViewbox) ? rawViewbox.split(' ').map(i => parseInt(i, 10)) : [null, null, null, null];
         return [corners[2], corners[3]];
       });
 
@@ -130,7 +136,7 @@ export default {
       });
 
       value = mapElements(svg, {}, (elem) => {
-        const cssClass = (elem.attrs && elem.attrs.class) ? elem.attrs.class.value : '';
+        const cssClass = get(elem, 'attrs.class.value', '');
 
         return declaredFills[`.${cssClass}`];
       });
@@ -144,12 +150,20 @@ export default {
 
     if (svg) {
       mapElements(svg, { type: 'svg' }, (elem) => {
-        if (elem.attrs && elem.attrs.display && elem.attrs.display.value === 'none') {
+        if (get(elem, 'attrs.display.value') === 'none') {
           value = true;
         }
       });
     }
 
     return value;
+  },
+
+  containsAnImage(_raw, svg) {
+    return hasElementType(svg, { type: 'image' });
+  },
+
+  isSvgFont(_raw, svg) {
+    return hasElementType(svg, { type: 'glyph' });
   },
 };

@@ -49,6 +49,17 @@ const MESSAGES = [
     }
   },
 
+  function* inkscapeFormat(d) {
+    if (d.inkscapeFormat) {
+      yield {
+        error: {
+          code: 'INKSCAPE_FORMAT',
+          desc: 'This file is formatted for the Inkscape app. It is not a valid SVG document.',
+        },
+      };
+    }
+  },
+
   function* lowPrecision(d) {
     const acceptable = 500 * 500;
     const viewboxArea = (d.viewboxSize) ? d.viewboxSize[0] * d.viewboxSize[1] : acceptable;
@@ -79,7 +90,40 @@ const MESSAGES = [
       yield {
         error: {
           code: 'EVERYTHING_HIDDEN',
-          decs: 'The <svg> element is set to "display: none" which will result in everything being hidden.',
+          desc: 'The <svg> element is set to "display: none" which will result in everything being hidden.',
+        },
+      };
+    }
+  },
+
+  function* containsAnImage(d) {
+    if (d.containsAnImage) {
+      yield {
+        warning: {
+          code: 'CONTAINS_IMAGES',
+          desc: 'Contains bitmap images that cannot be converted into icons.',
+        },
+      };
+    }
+  },
+
+  function* missingViewbox(d) {
+    if (d.viewboxSize[0] === null && d.viewboxSize[1] === null) {
+      yield {
+        error: {
+          code: 'MISSING_VIEWBOX',
+          desc: 'Contains bitmap images that cannot be converted into icons.',
+        },
+      };
+    }
+  },
+
+  function* isSvgFont(d) {
+    if (d.isSvgFont) {
+      yield {
+        error: {
+          code: 'IS_SVG_FONT',
+          desc: 'This is an SVG font which cannot be directly converted into a single icon.',
         },
       };
     }

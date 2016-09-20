@@ -21,3 +21,13 @@ export function mapElements(p, options, callback) {
 
   return value;
 }
+
+export function hasElementType(p, options) {
+  let value = false;
+
+  if (p) {
+    value = mapElements(p, options, elem => elem).length > 0;
+  }
+
+  return value;
+}

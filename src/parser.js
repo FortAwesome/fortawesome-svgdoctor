@@ -62,8 +62,26 @@ function generateMessages(determinations) {
   });
 }
 
+function mergeMessages(output, generated) {
+  const nextOutput = Object.assign({}, output);
+
+  nextOutput.messages.errors = Array.concat(
+    output.messages.errors,
+    generated.messages.errors
+  );
+  nextOutput.messages.warnings = Array.concat(
+    output.messages.warnings,
+    generated.messages.warnings
+  );
+  nextOutput.stoplight = (output.stoplight) ?
+    output.stoplight :
+    generated.stoplight;
+
+  return nextOutput;
+}
+
 export default function (svgDataBuffer) {
-  const output = {
+  let output = {
     stoplight: null,
     messages: {
       errors: [],
@@ -83,27 +101,21 @@ export default function (svgDataBuffer) {
 
       const svgData = svgDataBuffer.toString();
 
-      optimize(svgDataBuffer)
-        .then((optimizedData) => {
-          output.optimized = optimizedData.data;
-
-          return inspect(svgData, (error) ? null : parsedSvg);
-        })
+      inspect(svgData, (error) ? null : parsedSvg)
         .then(determinations => generateMessages(determinations))
         .then((generated) => {
-          output.messages.errors = Array.concat(
-            output.messages.errors,
-            generated.messages.errors
-          );
-          output.messages.warnings = Array.concat(
-            output.messages.warnings,
-            generated.messages.warnings
-          );
-          output.stoplight = (output.stoplight) ?
-            output.stoplight :
-            generated.stoplight;
+          output = mergeMessages(output, generated);
 
-          resolve(output);
+          if (output.stoplight === STOPLIGHT_GREEN) {
+            optimize(svgDataBuffer)
+              .then((optimizedData) => {
+                output.optimized = optimizedData.data;
+
+                resolve(output);
+              });
+          } else {
+            resolve(output);
+          }
         });
     });
   });

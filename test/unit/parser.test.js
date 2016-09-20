@@ -76,6 +76,15 @@ describe('Parser', function () {
       });
   });
 
+  it('will detect inkscape attributes', function (done) {
+    parser(fixture('inkscape-attributes.svg'))
+      .then((output) => {
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('INKSCAPE_FORMAT');
+        done();
+      });
+  });
+
   it('will detect a small viewbox with low precision', function (done) {
     parser(fixture('small-and-low-precision.svg'))
       .then((output) => {
@@ -94,7 +103,7 @@ describe('Parser', function () {
       });
   });
 
-  it.only('will detect if the entire SVG is set to display: none', function (done) {
+  it('will detect if the entire SVG is set to display: none', function (done) {
     parser(fixture('svg-display-none.svg'))
       .then((output) => {
         expect(output).to.be.redStoplight();
@@ -103,12 +112,31 @@ describe('Parser', function () {
       });
   });
 
-  it('will detect image or CDATA elements', function (done) {
+  it('will detect images', function (done) {
+    parser(fixture('with-image.svg'))
+      .then((output) => {
+        expect(output).to.be.yellowStoplight();
+        expect(output).to.warn('CONTAINS_IMAGES');
+        done();
+      });
   });
 
-  xit('will require a viewbox or an x and y', function (done) {
+  it('will require a viewbox', function (done) {
+    parser(fixture('no-viewbox.svg'))
+      .then((output) => {
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('MISSING_VIEWBOX');
+        done();
+      });
   });
 
-  xit('will detect references to fonts', function (done) {
+  it('will detect references to fonts', function (done) {
+    this.timeout(4000);
+    parser(fixture('svg-font.svg'))
+      .then((output) => {
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('IS_SVG_FONT');
+        done();
+      });
   });
 });
