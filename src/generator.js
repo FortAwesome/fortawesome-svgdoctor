@@ -136,8 +136,6 @@ const MESSAGES = [
       const maxX = minX + width;
       const maxY = minY + height;
 
-      console.log(minX, minY, maxX, maxY);
-
       for (const point of d.points) {
         if (point[0] < minX || point[0] > maxX || point[1] < minY || point[1] > maxY) {
           isOffViewbox = true;
