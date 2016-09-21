@@ -13,9 +13,8 @@ describe('Parser', function () {
   it('will handle bad file type', function (done) {
     parser(fixture('bad-file-type.jpg'))
       .then((output) => {
-        expect(output.messages.errors.length).to.equal(1);
-        expect(output.stoplight).to.equal('red');
-
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('PARSE_FAILED');
         done();
       });
   });
@@ -23,10 +22,10 @@ describe('Parser', function () {
   it('will optimize the file', function (done) {
     parser(fixture('valid.svg'))
       .then((output) => {
-        expect(output.stoplight).to.equal('green');
+        expect(output).to.be.greenStoplight();
         expect(output.messages.errors.length).to.equal(0);
+        expect(output.messages.warnings.length).to.equal(0);
         expect(output.optimized.length).to.be.above(0);
-
         done();
       });
   });
@@ -131,11 +130,19 @@ describe('Parser', function () {
   });
 
   it('will detect references to fonts', function (done) {
-    this.timeout(4000);
     parser(fixture('svg-font.svg'))
       .then((output) => {
         expect(output).to.be.redStoplight();
         expect(output).to.error('IS_SVG_FONT');
+        done();
+      });
+  });
+
+  it('will detect spleens off the viewport', function (done) {
+    parser(fixture('points-out-of-viewport.svg'))
+      .then((output) => {
+        expect(output).to.be.yellowStoplight();
+        expect(output).to.warn('EXCEEDS_VIEWBOX');
         done();
       });
   });

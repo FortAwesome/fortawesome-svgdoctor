@@ -16,49 +16,57 @@ function optimize(svgData) {
 }
 
 function inspect(rawSvg, parsedSvg) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const determinations = {};
 
-    for (const key of Object.keys(inspectors)) {
-      determinations[key] = inspectors[key](rawSvg, parsedSvg);
-    }
+    try {
+      for (const key of Object.keys(inspectors)) {
+        determinations[key] = inspectors[key](rawSvg, parsedSvg);
+      }
 
-    resolve(determinations);
+      resolve(determinations);
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 
 function generateMessages(determinations) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     let errors = [];
     let warnings = [];
 
-    for (const message of generator(determinations)) {
-      if (message.error) {
-        errors = Array.concat(errors, message.error);
+    try {
+      for (const message of generator(determinations)) {
+        if (message.error) {
+          errors = Array.concat(errors, message.error);
+        }
+
+        if (message.warning) {
+          warnings = Array.concat(warnings, message.warning);
+        }
       }
 
-      if (message.warning) {
-        warnings = Array.concat(warnings, message.warning);
+      let stoplight = STOPLIGHT_GREEN;
+
+      if (warnings.length > 0) {
+        stoplight = STOPLIGHT_YELLOW;
       }
+
+      if (errors.length > 0) {
+        stoplight = STOPLIGHT_RED;
+      }
+
+      resolve({
+        messages: {
+          errors,
+          warnings,
+        },
+        stoplight,
+      });
+    } catch (e) {
+      reject(e);
     }
-
-    let stoplight = STOPLIGHT_GREEN;
-
-    if (warnings.length > 0) {
-      stoplight = STOPLIGHT_YELLOW;
-    }
-
-    if (errors.length > 0) {
-      stoplight = STOPLIGHT_RED;
-    }
-
-    resolve({
-      messages: {
-        errors,
-        warnings,
-      },
-      stoplight,
-    });
   });
 }
 
@@ -73,9 +81,12 @@ function mergeMessages(output, generated) {
     output.messages.warnings,
     generated.messages.warnings
   );
-  nextOutput.stoplight = (output.stoplight) ?
-    output.stoplight :
-    generated.stoplight;
+
+  if (output.stoplight !== STOPLIGHT_RED) {
+    nextOutput.stoplight = (output.stoplight) ?
+      output.stoplight :
+      generated.stoplight;
+  }
 
   return nextOutput;
 }
@@ -90,7 +101,7 @@ export default function (svgDataBuffer) {
     optimized: null,
   };
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     svg2js(svgDataBuffer, (parsedSvg) => {
       const { error } = parsedSvg;
 
@@ -116,6 +127,10 @@ export default function (svgDataBuffer) {
           } else {
             resolve(output);
           }
+        })
+        .catch((e) => {
+          console.log(e);
+          reject(e);
         });
     });
   });

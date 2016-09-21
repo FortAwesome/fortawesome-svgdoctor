@@ -62,7 +62,7 @@ const MESSAGES = [
 
   function* lowPrecision(d) {
     const acceptable = 500 * 500;
-    const viewboxArea = (d.viewboxSize) ? d.viewboxSize[0] * d.viewboxSize[1] : acceptable;
+    const viewboxArea = (d.viewbox[2] !== null && d.viewbox[3] !== null) ? d.viewbox[2] * d.viewbox[3] : acceptable;
 
     if (viewboxArea < acceptable && d.decimalPrecision < 3) {
       yield {
@@ -108,7 +108,7 @@ const MESSAGES = [
   },
 
   function* missingViewbox(d) {
-    if (d.viewboxSize[0] === null && d.viewboxSize[1] === null) {
+    if (d.viewbox[0] === null && d.viewbox[1] === null) {
       yield {
         error: {
           code: 'MISSING_VIEWBOX',
@@ -128,5 +128,30 @@ const MESSAGES = [
       };
     }
   },
-];
 
+  function* pointsOffViewbox(d) {
+    if (d.viewbox[0] !== null && d.viewbox[1] !== null) {
+      let isOffViewbox = false;
+      const [minX, minY, width, height] = d.viewbox;
+      const maxX = minX + width;
+      const maxY = minY + height;
+
+      console.log(minX, minY, maxX, maxY);
+
+      for (const point of d.points) {
+        if (point[0] < minX || point[0] > maxX || point[1] < minY || point[1] > maxY) {
+          isOffViewbox = true;
+        }
+      }
+
+      if (isOffViewbox) {
+        yield {
+          warning: {
+            code: 'EXCEEDS_VIEWBOX',
+            desc: 'This is an SVG font which cannot be directly converted into a single icon.',
+          },
+        };
+      }
+    }
+  },
+];

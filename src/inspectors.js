@@ -103,17 +103,54 @@ export default {
     return value;
   },
 
-  viewboxSize(_raw, svg) {
-    let value = 0;
+  points(_raw, svg) {
+    const value = [];
+
+    if (svg) {
+      mapElements(svg, { type: 'path' }, (elem) => {
+        const path = svgPathParser(get(elem, 'attrs.d.value'));
+        let x = 0;
+        let y = 0;
+
+        for (const command of path) {
+          const com = command.command;
+
+          if (com === 'horizontal lineto' && !command.relative) {
+            x = command.x;
+          }
+
+          if (com === 'vertical lineto' && !command.relative) {
+            y = command.y;
+          }
+
+          if (command.relative) {
+            x = (command.x) ? x + command.x : x;
+            y = (command.y) ? y + command.y : y;
+          }
+
+          if (~['curveto', 'lineto', 'moveto'].indexOf(com) && !command.relative) {
+            x = command.x;
+            y = command.y;
+          }
+
+          value.push([x, y]);
+        }
+      });
+    }
+
+    return value;
+  },
+
+  viewbox(_raw, svg) {
+    let value = [null, null, null, null];
 
     if (svg) {
       const viewboxes = mapElements(svg, { type: 'svg' }, (elem) => {
         const rawViewbox = get(elem, 'attrs.viewBox.value', null);
-        const corners = (rawViewbox) ? rawViewbox.split(' ').map(i => parseInt(i, 10)) : [null, null, null, null];
-        return [corners[2], corners[3]];
+        return (rawViewbox) ? rawViewbox.split(' ').map(i => parseInt(i, 10)) : [null, null, null, null];
       });
 
-      value = (viewboxes) ? viewboxes[0] : null;
+      value = (viewboxes) ? viewboxes[0] : value;
     }
 
     return value;

@@ -2,16 +2,16 @@ import fs from 'fs';
 import cli from 'cli';
 import parser from './parser';
 
-const options = cli.parse({
+cli.parse({
   file: ['f', 'SVG to process', 'file'],
-})
+});
 
 export default function run() {
   cli.main(function (args, options) {
-    const {file} = options;
+    const { file } = options;
 
     if (!file) {
-      this.fatal("Could not find the SVG file. Make sure you are using -f FILE.");
+      this.fatal('Could not find the SVG file. Make sure you are using -f FILE.');
     }
 
     fs.readFile(file, 'utf8', (err, data) => {
@@ -22,7 +22,7 @@ export default function run() {
       parser(data)
         .then((output) => {
           console.log(JSON.stringify(output, null, 2));
-        })
+        });
     });
   });
 }

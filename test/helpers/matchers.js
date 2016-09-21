@@ -1,5 +1,13 @@
 import chai from 'chai';
 
+chai.Assertion.addMethod('greenStoplight', function () {
+  this.assert(
+    (this._obj.stoplight === 'green'),
+    'expected stoplight to be green',
+    'expected stoplight not to be green'
+  );
+});
+
 chai.Assertion.addMethod('yellowStoplight', function () {
   this.assert(
     (this._obj.stoplight === 'yellow'),
