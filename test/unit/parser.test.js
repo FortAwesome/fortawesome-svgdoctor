@@ -129,7 +129,7 @@ describe('Parser', function () {
       });
   });
 
-  it('will detect references to fonts', function (done) {
+  it('will detect SVG font files', function (done) {
     parser(fixture('svg-font.svg'))
       .then((output) => {
         expect(output).to.be.redStoplight();
@@ -143,6 +143,15 @@ describe('Parser', function () {
       .then((output) => {
         expect(output).to.be.yellowStoplight();
         expect(output).to.warn('EXCEEDS_VIEWBOX');
+        done();
+      });
+  });
+
+  it.only('will detect a reference to a system font', function (done) {
+    parser(fixture('linked-font.svg'))
+      .then((output) => {
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('CONTAINS_TEXT');
         done();
       });
   });

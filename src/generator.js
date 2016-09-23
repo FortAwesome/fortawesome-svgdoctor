@@ -152,4 +152,15 @@ const MESSAGES = [
       }
     }
   },
+
+  function* containsText(d) {
+    if (d.containsText) {
+      yield {
+        error: {
+          code: 'CONTAINS_TEXT',
+          desc: 'Contains text elements which should be converted to outlines.',
+        },
+      };
+    }
+  },
 ];

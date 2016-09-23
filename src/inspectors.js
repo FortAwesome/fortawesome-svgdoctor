@@ -203,4 +203,8 @@ export default {
   isSvgFont(_raw, svg) {
     return hasElementType(svg, { type: 'glyph' });
   },
+
+  containsText(_raw, svg) {
+    return hasElementType(svg, { type: 'text' });
+  },
 };
