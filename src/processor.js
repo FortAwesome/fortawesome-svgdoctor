@@ -1,14 +1,16 @@
 import fs from 'fs';
 import cli from 'cli';
 import parser from './parser';
+import ui from './ui';
 
 cli.parse({
   file: ['f', 'SVG to process', 'file'],
+  json: ['j', 'Output in JSON format'],
 });
 
 export default function run() {
   cli.main(function (args, options) {
-    const { file } = options;
+    const { file, json } = options;
 
     if (!file) {
       this.fatal('Could not find the SVG file. Make sure you are using -f FILE.');
@@ -21,7 +23,7 @@ export default function run() {
 
       parser(data)
         .then((output) => {
-          console.log(JSON.stringify(output, null, 2));
+          return (json) ? ui.json(output) : ui.humans(output);
         });
     });
   });

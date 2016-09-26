@@ -147,7 +147,15 @@ describe('Parser', function () {
       });
   });
 
-  it.only('will detect a reference to a system font', function (done) {
+  it('will detect spleens inside the viewport with transforms', function (done) {
+    parser(fixture('points-inside-of-viewport-with-transform.svg'))
+      .then((output) => {
+        expect(output).to.not.warn('EXCEEDS_VIEWBOX');
+        done();
+      });
+  });
+
+  it('will detect a reference to a system font', function (done) {
     parser(fixture('linked-font.svg'))
       .then((output) => {
         expect(output).to.be.redStoplight();

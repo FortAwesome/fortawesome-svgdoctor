@@ -6,7 +6,7 @@ import uniq from 'lodash-node/modern/array/uniq';
 import filter from 'lodash-node/modern/collection/filter';
 import css from 'css';
 import svgPathParser from 'svg-path-parser';
-import { mapElements, hasElementType } from './utils';
+import { mapElements, hasElementType, svgTransformParser } from './utils';
 
 export default {
   strokedPaths(_raw, svg) {
@@ -18,20 +18,6 @@ export default {
       });
 
       value = some(strokesPresent);
-    }
-
-    return value;
-  },
-
-  pointCount(_raw, svg) {
-    let value = 0;
-
-    if (svg) {
-      const counts = mapElements(svg, { type: 'path' }, (elem) => {
-        return svgPathParser(elem.attrs.d.value).length;
-      });
-
-      value = sum(counts);
     }
 
     return value;
@@ -109,6 +95,9 @@ export default {
     if (svg) {
       mapElements(svg, { type: 'path' }, (elem) => {
         const path = svgPathParser(get(elem, 'attrs.d.value'));
+        const transform = svgTransformParser(get(elem, 'attrs.transform.value'));
+        const translateX = get(transform, 'translate.x', 0);
+        const translateY = get(transform, 'translate.y', 0);
         let x = 0;
         let y = 0;
 
@@ -133,7 +122,7 @@ export default {
             y = command.y;
           }
 
-          value.push([x, y]);
+          value.push([x + translateX, y + translateY]);
         }
       });
     }

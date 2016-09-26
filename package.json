@@ -37,6 +37,7 @@
   "dependencies": {
     "babel-polyfill": "^6.13.0",
     "cli": "^1.0.0",
+    "cli-color": "^1.1.0",
     "css": "^2.2.1",
     "eslint": "^3.5.0",
     "eslint-config-airbnb": "^11.1.0",

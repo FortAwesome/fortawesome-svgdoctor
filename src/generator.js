@@ -1,3 +1,7 @@
+import { pointExceedsViewbox } from './utils';
+
+const VIEWBOX_PRECISION_PADDING = 2;
+
 export default function* generator(determinations) {
   for (const message of MESSAGES) {
     yield* message(determinations);
@@ -17,11 +21,11 @@ const MESSAGES = [
   },
 
   function* tooManyPoints(d) {
-    if (d.pointCount > 1000) {
+    if (d.points.length > 1000) {
       yield {
         warning: {
           code: 'LOTS_OF_POINTS',
-          desc: `Contains at least ${d.pointCount} points.`,
+          desc: `Contains at least ${d.points.length} points.`,
         },
       };
     }
@@ -112,7 +116,7 @@ const MESSAGES = [
       yield {
         error: {
           code: 'MISSING_VIEWBOX',
-          desc: 'Contains bitmap images that cannot be converted into icons.',
+          desc: 'The <svg> element is missing the "viewBox" attribute which defines the visible area.',
         },
       };
     }
@@ -132,12 +136,9 @@ const MESSAGES = [
   function* pointsOffViewbox(d) {
     if (d.viewbox[0] !== null && d.viewbox[1] !== null) {
       let isOffViewbox = false;
-      const [minX, minY, width, height] = d.viewbox;
-      const maxX = minX + width;
-      const maxY = minY + height;
 
       for (const point of d.points) {
-        if (point[0] < minX || point[0] > maxX || point[1] < minY || point[1] > maxY) {
+        if (pointExceedsViewbox(point[0], point[1], d.viewbox, { padding: VIEWBOX_PRECISION_PADDING })) {
           isOffViewbox = true;
         }
       }
@@ -146,7 +147,7 @@ const MESSAGES = [
         yield {
           warning: {
             code: 'EXCEEDS_VIEWBOX',
-            desc: 'This is an SVG font which cannot be directly converted into a single icon.',
+            desc: 'Some parts of this SVG appear to be outside of the viewbox.',
           },
         };
       }
