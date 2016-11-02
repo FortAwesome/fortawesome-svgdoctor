@@ -30,11 +30,29 @@ describe('Parser', function () {
       });
   });
 
-  it('will prevent an SVG that crashes FontForge', function (done) {
-    parser(fixture('dropforge-killer.svg'))
+  it('will prevent an SVG that crashes FontForge (example 1)', function (done) {
+    parser(fixture('dropforge-killer-1.svg'))
       .then((output) => {
         expect(output).to.be.redStoplight();
-        expect(output).to.error('PATH_STROKES');
+        expect(output).to.error('SHAPE_STROKES');
+        done();
+      });
+  });
+
+  it('will prevent an SVG that crashes FontForge (example 2)', function (done) {
+    parser(fixture('dropforge-killer-2.svg'))
+      .then((output) => {
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('SHAPE_STROKES');
+        done();
+      });
+  });
+
+  it('will process CDATA with stroke from styles', function (done) {
+    parser(fixture('has-cdata.svg'))
+      .then((output) => {
+        expect(output).to.be.redStoplight();
+        expect(output).to.error('SHAPE_STROKES');
         done();
       });
   });

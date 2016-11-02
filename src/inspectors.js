@@ -4,17 +4,37 @@ import sum from 'lodash-node/modern/math/sum';
 import flatten from 'lodash-node/modern/array/flatten';
 import uniq from 'lodash-node/modern/array/uniq';
 import filter from 'lodash-node/modern/collection/filter';
+import Big from 'big.js';
 import css from 'css';
 import svgPathParser from 'svg-path-parser';
 import { mapElements, hasElementType, svgTransformParser } from './utils';
 
 export default {
-  strokedPaths(_raw, svg) {
+  strokedShapes(_raw, svg) {
+    const declaredStrokes = new Set();
+
     let value = 0;
 
     if (svg) {
-      const strokesPresent = mapElements(svg, { type: 'path' }, (elem) => {
-        return !!(elem.attrs.stroke && elem.attrs['stroke-width']);
+      mapElements(svg, { type: 'style' }, (elem) => {
+        const { stylesheet } = css.parse(elem.content[0].text || elem.content[0].cdata);
+        for (const rule of stylesheet.rules) {
+          for (const declaration of rule.declarations) {
+            if (declaration.property === 'stroke') {
+              declaredStrokes.add(rule.selectors[0]);
+            }
+          }
+        }
+      });
+
+      const strokesPresent = mapElements(svg, { anyShape: true }, (elem) => {
+        const strokedClasses = get(elem, 'attrs.class.value', '')
+          .split(' ')
+          .filter(cls => declaredStrokes.has(`.${cls}`));
+        const hasStrokedClass = strokedClasses.length > 0;
+        const hasStrokeOnElement = !!(elem.attrs.stroke && elem.attrs['stroke-width']);
+
+        return hasStrokedClass || hasStrokeOnElement;
       });
 
       value = some(strokesPresent);
@@ -62,15 +82,35 @@ export default {
     let value = 0;
 
     if (svg) {
-      const numbers = mapElements(svg, { type: 'path' }, (elem) => {
-        const path = svgPathParser(elem.attrs.d.value);
+      const numbers = mapElements(svg, { anyShape: true }, (elem) => {
         const data = [];
-        const lookingFor = ['x', 'y'];
+        const lookingFor = ['x', 'y', 'x1', 'x2', 'y1', 'y2', 'cx', 'cy', 'r', 'ry', 'rx', 'width', 'height'];
 
-        for (const command of path) {
+        if (get(elem, 'attrs.d.value')) {
+          const path = svgPathParser(elem.attrs.d.value);
+
+          for (const command of path) {
+            ['x', 'y'].forEach((key) => {
+              if (command[key]) {
+                data.push(command[key]);
+              }
+            });
+          }
+        } else if (get(elem, 'attrs.points.value')) {
+          const points = elem.attrs.points.value.split(' ');
+
+          points.forEach((point) => {
+            const [x, y] = point.split(',');
+
+            data.push(parseInt(x, 10));
+            data.push(parseInt(y, 10));
+          });
+        } else {
           lookingFor.forEach((key) => {
-            if (command[key]) {
-              data.push(command[key]);
+            const attrValue = get(elem, `attrs.${key}.value`);
+
+            if (attrValue) {
+              data.push(parseInt(attrValue, 10));
             }
           });
         }
@@ -96,33 +136,33 @@ export default {
       mapElements(svg, { type: 'path' }, (elem) => {
         const path = svgPathParser(get(elem, 'attrs.d.value'));
         const transform = svgTransformParser(get(elem, 'attrs.transform.value'));
-        const translateX = get(transform, 'translate.x', 0);
-        const translateY = get(transform, 'translate.y', 0);
-        let x = 0;
-        let y = 0;
+        const translateX = new Big(get(transform, 'translate.x', 0));
+        const translateY = new Big(get(transform, 'translate.y', 0));
+        let x = new Big(0);
+        let y = new Big(0);
 
         for (const command of path) {
           const com = command.command;
 
           if (com === 'horizontal lineto' && !command.relative) {
-            x = command.x;
+            x = new Big(command.x);
           }
 
           if (com === 'vertical lineto' && !command.relative) {
-            y = command.y;
+            y = new Big(command.y);
           }
 
           if (command.relative) {
-            x = (command.x) ? x + command.x : x;
-            y = (command.y) ? y + command.y : y;
+            x = (command.x) ? x.plus(command.x) : new Big(x);
+            y = (command.y) ? y.plus(command.y) : new Big(y);
           }
 
           if (~['curveto', 'lineto', 'moveto'].indexOf(com) && !command.relative) {
-            x = command.x;
-            y = command.y;
+            x = new Big(command.x);
+            y = new Big(command.y);
           }
 
-          value.push([x + translateX, y + translateY]);
+          value.push([parseFloat(x.plus(translateX)), parseFloat(y.plus(translateY))]);
         }
       });
     }
@@ -136,7 +176,7 @@ export default {
     if (svg) {
       const viewboxes = mapElements(svg, { type: 'svg' }, (elem) => {
         const rawViewbox = get(elem, 'attrs.viewBox.value', null);
-        return (rawViewbox) ? rawViewbox.split(' ').map(i => parseInt(i, 10)) : [null, null, null, null];
+        return (rawViewbox) ? rawViewbox.split(' ').map(i => parseFloat(i)) : [null, null, null, null];
       });
 
       value = (viewboxes) ? viewboxes[0] : value;
@@ -151,7 +191,7 @@ export default {
 
     if (svg) {
       mapElements(svg, { type: 'style' }, (elem) => {
-        const { stylesheet } = css.parse(elem.content[0].text);
+        const { stylesheet } = css.parse(elem.content[0].text || elem.content[0].cdata);
         for (const rule of stylesheet.rules) {
           for (const declaration of rule.declarations) {
             if (declaration.property === 'fill') {
