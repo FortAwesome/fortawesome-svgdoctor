@@ -1,0 +1,34 @@
+<svg xmlns="http://email.mg.fortawesome.com/c/eJxdjcsOgyAQRb9GlpNhwAEWLNpE_0PloUkpjZry-2Xd5CT33NUJPtkxWSMOTyhZSiRkZRSC6QpaM0qYpqdkntWgsWRI9byXFq9aImy1iN2vqPQSY6BxtFZTJMZIgVfrknRmc-Ll9_v-DOox0NxprUFTUM_cDyFin-ubxemXUI53z_w1fpK5L_k" id="Layer_1" data-name="Layer 1" width="119.8" height="119.8" viewBox="0 0 119.8 119.8">
+ <defs>
+   <style>.cls-1{fill:none;stroke:#fff;stroke-linecap:round;stroke-width:2px;}.cls-2{fill:#fff;}</style>
+ </defs>
+ <title>low-mid-high</title>
+ <g id="Layer_2" data-name="Layer 2">
+   <g id="Layer_1-2" data-name="Layer 1-2">
+     <polyline class="cls-1" points="90.84 44.12 102.58 44.12 111.82 35.19"/>
+     <polyline class="cls-1" points="90.76 51.65 105.05 51.65 115.94 41.36"/>
+     <polyline class="cls-1" points="91.38 59.17 107.16 59.17 118.8 47.69"/>
+     <polyline class="cls-1" points="90.76 66.7 106.16 66.7 115.07 78"/>
+     <polyline class="cls-1" points="90.76 74.22 104.02 74.22 111.41 84.61"/>
+     <polyline class="cls-1" points="28.96 75.67 17.23 75.67 7.98 84.61"/>
+     <polyline class="cls-1" points="29.04 68.16 14.76 68.16 3.86 78.44"/>
+     <polyline class="cls-1" points="28.43 60.63 12.64 60.63 1 72.11"/>
+     <polyline class="cls-1" points="29.04 53.11 13.64 53.11 4.73 41.8"/>
+     <polyline class="cls-1" points="29.04 45.58 15.78 45.58 8.39 35.19"/>
+     <polyline class="cls-1" points="75.67 90.84 75.67 102.58 84.61 111.82"/>
+     <polyline class="cls-1" points="68.16 90.76 68.16 105.05 78.44 115.94"/>
+     <polyline class="cls-1" points="60.63 91.38 60.63 107.16 72.11 118.8"/>
+     <polyline class="cls-1" points="53.11 90.76 53.11 106.16 41.8 115.07"/>
+     <polyline class="cls-1" points="45.58 90.76 45.58 104.02 35.19 111.41"/>
+     <polyline class="cls-1" points="44.12 28.96 44.12 17.23 35.19 7.98"/>
+     <polyline class="cls-1" points="51.65 29.04 51.65 14.76 41.36 3.86"/>
+     <polyline class="cls-1" points="59.17 28.43 59.17 12.64 47.69 1"/>
+     <polyline class="cls-1" points="66.7 29.04 66.7 13.64 78 4.73"/>
+     <polyline class="cls-1" points="74.22 29.04 74.22 15.78 84.61 8.39"/>
+     <path class="cls-2" d="M91.82,37.05h-1.1V36.6a8.23,8.23,0,0,0-8.23-8.23H82v-1.5H37.73v1.55h-.45a8.23,8.23,0,0,0-8.23,8.23v.4H27.49V81.44H29v.45a8.23,8.23,0,0,0,8.23,8.23h.45v1.55H82.08V90.13h.45a8.23,8.23,0,0,0,8.23-8.23h0v-.45h1.06Zm-4,43.05a7.1,7.1,0,0,1-7.1,7.1H39a7.1,7.1,0,0,1-7.1-7.1h0V38.39a7.1,7.1,0,0,1,7.1-7.1h41.8a7.1,7.1,0,0,1,7.1,7.1h0Z"/>
+     <rect class="cls-2" x="69.72" y="37.93" width="5.25" height="42.69" rx="1.01" ry="1.01"/>
+     <rect class="cls-2" x="57.06" y="53.49" width="5.25" height="27.14" rx="1.01" ry="1.01"/>
+     <rect class="cls-2" x="44.38" y="67.88" width="5.25" height="12.74" rx="1.01" ry="1.01"/>
+   </g>
+ </g>
+</svg>

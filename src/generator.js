@@ -1,7 +1,5 @@
 import { pointExceedsViewbox } from './utils';
 
-const VIEWBOX_PRECISION_PADDING = 2;
-
 export default function* generator(determinations) {
   for (const message of MESSAGES) {
     yield* message(determinations);
@@ -10,11 +8,11 @@ export default function* generator(determinations) {
 
 const MESSAGES = [
   function* strokes(d) {
-    if (d.strokedPaths) {
+    if (d.strokedShapes) {
       yield {
         error: {
-          code: 'PATH_STROKES',
-          desc: 'Paths exist that have some kind of stroke.',
+          code: 'SHAPE_STROKES',
+          desc: 'Shapes exist that have some kind of stroke.',
         },
       };
     }
@@ -66,7 +64,9 @@ const MESSAGES = [
 
   function* lowPrecision(d) {
     const acceptable = 500 * 500;
-    const viewboxArea = (d.viewbox[2] !== null && d.viewbox[3] !== null) ? d.viewbox[2] * d.viewbox[3] : acceptable;
+    const w = d.viewbox[2];
+    const h = d.viewbox[3];
+    const viewboxArea = (w !== null && h !== null) ? w * h : acceptable;
 
     if (viewboxArea < acceptable && d.decimalPrecision < 3) {
       yield {
@@ -138,7 +138,7 @@ const MESSAGES = [
       let isOffViewbox = false;
 
       for (const point of d.points) {
-        if (pointExceedsViewbox(point[0], point[1], d.viewbox, { padding: VIEWBOX_PRECISION_PADDING })) {
+        if (pointExceedsViewbox(point[0], point[1], d.viewbox)) {
           isOffViewbox = true;
         }
       }

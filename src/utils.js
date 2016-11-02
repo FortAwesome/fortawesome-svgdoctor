@@ -1,3 +1,35 @@
+import Big from 'big.js';
+
+const shapeElements = [
+  'circle',
+  'ellipse',
+  'line',
+  'mesh',
+  'path',
+  'polygon',
+  'polyline',
+  'rect',
+];
+
+export function elementMatches(element, options) {
+  const optionsEmpty = Object.keys(options).length === 0;
+  let value = false;
+
+  if (!optionsEmpty) {
+    if (options.anyShape && ~shapeElements.indexOf(element)) {
+      value = true;
+    }
+
+    if (options.type !== undefined && element === options.type) {
+      value = true;
+    }
+  } else {
+    value = true;
+  }
+
+  return value;
+}
+
 export function mapElements(p, options, callback) {
   let value = [];
 
@@ -11,7 +43,7 @@ export function mapElements(p, options, callback) {
     }
   }
 
-  if (options.type === undefined || p.elem === options.type) {
+  if (elementMatches(p.elem, options)) {
     value.push(callback(p));
   }
 
@@ -33,31 +65,20 @@ export function hasElementType(p, options) {
 }
 
 export function svgTransformParser(transformValue) {
-  let value = {};
-  const translateMatch = (transformValue || "").match(/translate\((\-?[0-9\.]+)\s?(\-?[0-9\.]+)\)/);
+  const value = {};
+  const translateMatch = (transformValue || '').match(/translate\((\-?[0-9\.]+)\s?(\-?[0-9\.]+)\)/);
 
   if (translateMatch) {
-    let [_, x, y] = translateMatch;
+    const [_, x, y] = translateMatch;  // eslint-disable-line no-unused-vars
 
-    value['translate'] = {x: parseInt(x, 10), y: parseInt(y, 10)};
+    value.translate = { x: new Big(x), y: new Big(y) };
   }
 
   return value;
 }
 
-export function pointExceedsViewbox(x, y, viewbox, options) {
-  let optionsWithDefaults = Object.assign({}, {
-    padding: 0,
-  }, options);
-
-  const {padding} = optionsWithDefaults;
-
-  let [minX, minY, width, height] = viewbox;
-
-  minX   -= padding;
-  minY   -= padding;
-  width  += padding * 2;
-  height += padding * 2;
+export function pointExceedsViewbox(x, y, viewbox) {
+  const [minX, minY, width, height] = viewbox;
 
   const maxX = minX + width;
   const maxY = minY + height;
